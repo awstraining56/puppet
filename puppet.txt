@@ -94,3 +94,7 @@ On the server side : Signing the agent
     OR
    puppet cert  sign --all
 
+
+
+
+
