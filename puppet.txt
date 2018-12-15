@@ -36,7 +36,7 @@ user {"master":
 }
 
 
-On the puppet server
+On the puppet server   (port 8140 )
 =========================
 1. Install the repo and pkgs.
 
@@ -93,6 +93,46 @@ On the server side : Signing the agent
 
     OR
    puppet cert  sign --all
+
+
+
+
+
+
+
+puppet version:
+===============
+3.6
+3.8
+4.0
+5.3
+5.5
+6.0
+
+to check the puppet version ==>> puppet --version
+
+puppet describe resource user  | less
+
+
+puppet code : DSL(domain specific lanuage)
+============
+---create manifest
+	vi <file>.pp
+
+user { "myusertest":
+	ensure ==>'present',
+	managehome==> 'true'
+      }
+
+
+
+stepes to 
+1 gather the resource
+2 write the manifest
+3 validate the code   :   puppet parser validate <file name>
+4 test run/ test execution / dry run :  puppet apply <file> --noop
+5 apply the code
+
 
 
 
