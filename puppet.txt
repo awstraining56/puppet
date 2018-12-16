@@ -120,8 +120,8 @@ puppet code : DSL(domain specific lanuage)
 	vi <file>.pp
 
 user { "myusertest":
-	ensure ==>'present',
-	managehome==> 'true'
+	ensure =>'present',
+	managehome=> 'true'
       }
 
 
@@ -134,6 +134,181 @@ stepes to
 5 apply the code
 
 
+
+puppet code deployment 
+======================
+pre-requiste : -  puppet client-server comminication
+
+
+1. site.pp: host group deployment
+	declare the resource
+	
+	
+(for older version of puppet)
+file location /etc/puppet/manifest/site.pp 
+
+(for new version)
+
+file location /etc/puppetlabs/code/environment/production/manifest/site.pp 
+
+
+example: 
+
+user { "testuser":
+		ensure=>'present',
+		managehome=>'true',
+	 }
+
+(for validating the code )
+
+puppet parser validate site.pp	 
+	 
+for the deploymentfor the agent go to the client server 
+======================================================
+
+puppet agent -t 
+
+
+to check the config of run interval 
+puppet config print | grep -i interval 
+
+chaning run config interval
+
+puppet config set runinterval 60
+
+
+this is to create file in specified location example
+
+
+file {"/root/myfile":
+
+	ensure => 'file'
+	
+	}
+	
+	
+	
+file {"/root/mydirectory":
+		ensure=> 'directory',
+	}
+
+
+
+generating encrypting password 
+openssl passwd -crypt
+passwd 
+
+
+enter this code in the puppet
+
+
+creating group.
+
+
+
+puppet resource group root (help command)
+
+
+for directory 
+=======
+file{"/root/mydirectory":
+  ensure => 'directory',
+  owner => 'testuser2',
+  group => 'mygroup2',
+  mode => '0755'
+    }
+
+
+for file 
+=======
+
+file{"/root/myfile":
+  ensure => 'file',
+  owner => 'testuser2',
+  group => 'mygroup2',
+  mode => '0660',
+  content => "This is the my file content\n"
+    }
+
+	
+	
+for group 
+
+group{"mygroup1":
+  ensure => 'present'
+     }
+
+	 
+for user 
+
+
+user{"testuser2":
+  ensure => 'present',
+  managehome => true,
+  password => "qU.RNVsAyU.5Q",
+  groups => ['mygroup1','mygroup2'],
+  home => '/root/mydirectory',
+  gid => 'mygroup1',
+  uid => "10500"
+   }
+
+   
+ 
+ 
+ 
+ 
+ puppet agent -t   >>>>remote deployment
+ 
+ puppet apply file_user.pp    >>>>> local deplyoment 
+ 
+ 
+ 
+ manifest execution :   (order of execution will be decided by the puppet)
+ ======================
+ 
+ file { "file123":
+	ensure  => 'file'
+	owner => 'user123'
+	}
+	
+user {"user123":
+	ensure => 'present',
+	managehome =>true
+	
+	}
+ 
+ 
+ Resource Dependancies --->>>>to controle the execution:
+ =============================================
+ 
+ Require
+ Before
+ Nofify
+ Subscribe
+ 
+ 
+ 
+#To create the users with the below requriements.
+# primary group = group1
+#secondary group = group2
+#User name = newuser
+
+user{"newuser2":
+     ensure => 'present',
+     groups => 'group3',
+     home => '/root/newuser2',
+     managehome => true,
+     #require => Group['group1','group2']
+    }
+group{"group3":
+     ensure => 'present',
+     #before => User['newuser']
+     }
+file {"/root/newuser2":
+       ensure => 'directory'
+      }
+
+   
 
 
 
