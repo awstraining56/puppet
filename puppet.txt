@@ -310,6 +310,235 @@ file {"/root/newuser2":
 
    
 
+custom facters:
+==> key, value pars.
+
+key = value
+user_logged_in =20
+root_disk_space =50%
+
+#to check the user logged into system
+echo "users_logged_in=$(who | wc -l)"
+
+
+#to chec the disk space
+echo "root_disk_space=$(df -h /|awk '{print $5}' | grep -v Use)"
+
+
+
+
+2 locations to define custome facters 
+======================================
+/etc/facter/facts.d/
+or
+/etc/puppetlabs/puppet/facter/facts.d/
+
+mkdir -p /etc/facter/facts.d/
+or
+mkdir -p /etc/puppetlabs/facer/facts.de/
+
+
+
+#user logged in 
+#!/bin/bash
+echo "User_logged_in=$(who | wc -l)"
+
+#save as userloggedin.sh
+
+chmod 775 userloggedin.sh
+
+facter | grep -i User_logged
+
+#disk space usage
+[root@ip-172-31-89-81 facts.d]# vim disk_space.sh
+#!/bin/bash
+echo "root_disk_space=$(df -h /|awk '{print $5}' | grep -i -v use)"
+
+#save as diskspace.sh 
+
+
+facter | grep -i root_disk
+
+
+#disk space
+
+
+puppet conditionals:
+=======================
+
+Requirements : to create user or install package on differnet os flavors -
+
+
+	if <condition> {                            if $::osfamily == 'redhat': #calling parameter $:: is calling factor into code
+
+	variable1 => value
+
+	}
+	else {
+
+	variable1 => value
+
+	}
+
+	resource { "name":
+		attribute => 'value'
+	}
+
+
+
+
+ex:-----
+
+condition_if.pp
+===================
+case $::osfamily  {
+        'RedHat': {
+
+        $package  = sudo
+        $user = Linuxuser
+        }
+
+        'Debin':{
+        $package = devinstall
+        $user = debianuser
+        }
+
+        'Windows':{
+        $package = apache
+        $user = Windowsuser
+        }
+
+default:
+        {
+        $package = none
+        $user = dafaultuser
+        }
+}
+#package installation
+
+package { $package:
+        ensure => present,
+        }
+
+user {$user:
+        ensure => 'present',
+        managehome=> true,
+}
+
+
+
+
+
+case condition
+==========================================
+
+case $::osfamily {
+
+        'RedHat': {
+
+      $package = sudo
+      $user = myuser1
+        }
+
+         'Debin': {
+      $package = devinstall
+      $user = debianuser
+         }
+
+          'Windows': {
+      $package = apache
+      $user = windowsuser
+         }
+
+   default: {
+
+     $package = none
+     $user = defaultuser
+
+   }
+}
+
+#To install the package.
+
+  package {$package:
+     ensure => present
+      }
+  user{$user:
+     ensure => 'present',
+     managehome => true
+     }
+
+
+
+============================
+
+1 variable declaration
+2 control structure.
+3 functions
+
+
+
+in puppet function is replace with the class key word.
+
+
+function <name> {
+
+block of the code 
+}
+
+
+fucntion <name> ===>  to call the function standard way. 
+
+name  => to call the funcation in shell scripts
+
+
+
+class <name of the class> {
+
+resource declaration
+}
+
+incude <name of the class>
+
+ 
+
+
+
+ex:==========================
+
+====================
+
+
+#to define the class funtionality. 
+
+class user {
+
+	user{"classuser1":
+	ensure => 'present',
+	managehome => 'true'
+	}
+	
+	group {"mygroup_class":
+	ensure => 'present',
+	gid => 10534
+	}
+
+}
+
+# to call the class of function. 
+
+include user	
+
+
+
+
+
+
+
+
+
+
+
 
 
 
