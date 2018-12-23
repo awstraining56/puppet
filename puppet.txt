@@ -533,9 +533,355 @@ include user
 
 
 
+modules  ---> it will be created in .gz format
+==============
+
+
+1. Create a module
+
+name: <author> - <name of the module>
+
+2. Check the directory structure
+
+3. Write the code or requirement under the manifest
+
+4. build the module 
+
+5. install the module
+
+6. deploye the module
 
 
 
+
+ex:----------creating modules 
+
+1.create a module: Generate a module. 
+
+command : puppet module generate <author>-<module name>
+
+puppet module generate prashant-usermod
+
+cd usermod/manifest
+
+site.pp
+
+class usermod {
+
+	file { "data.txt":
+	ensure => 'file',
+	path => '/var/tmp/data.txt',
+	mode => '0777',
+		}
+
+	file { "directory":
+	ensure => 'directory',
+	path => '/var',
+	mode => '0777',
+
+
+}
+
+2 puppet parser validate usermod ( validating modules)
+
+3  puppet module build usermod   (for building module)
+
+4 puppet module install   <module name>
+
+ /etc/puppetlabs/code/environments/production/manifests/usermod/pkg/prashant-usermod-0.1.0/(package will be installed in this location )
+
+5 deployment
+go to /etc/puppetlabs/code/environments/production/manifests/
+
+edit site.pp file 
+
+
+node default {
+
+include <module name>
+
+}
+
+
+
+===============================================
+note: puppet module list to list the installed puppet module
+puppet config print  | grep -i module to chec the path of the module
+
+puppet apply -e usermod  --modulepath=./
+===============================================
+
+
+
+
+in the default manifest path add site.pp contet 
+
+node defualt {
+
+}
+
+
+
+subclasses in the modole 
+======================================================
+1. package 
+2. configure
+3. stat the service
+
+
+sub class:
+init.pp
+
+
+class <module> {
+code block
+}
+
+sub class1 
+sub class2 
+
+
+# using the name space we can write sub class name
+
+/module/manifest/init.pp -----> location
+
+
+
+package.pp
+class <module name > :: packaget
+code block
+
+puppet module generate ftp-prashant --skip-interview 
+
+class ftp-prashant
+{
+include	ftp-prashant::package.pp
+include	ftp-prashant::config.pp
+include	ftp-prashant::service.pp
+
+}
+
+
+package.pp
+
+classs ftp-prashant::pkg
+{
+	vsftpd{"pkg":
+	ensure => 'present',
+}	
+
+}
+
+
+config.pp
+class ftp-prashant::config {
+
+	file { "/var/ftp/pub":
+	
+	ensure => 'directory',
+	
+	mode => '0644'	
+}
+	
+}
+
+service.pp
+class ftp-prashant::service {
+
+	service {"vsftpd":
+	
+	ensure => 'running',
+	enable => 'true',
+
+}
+}
+
+puppet parser validate ftp-prashant
+
+
+cp -pr /ftp-prashant /etc/puppet 
+
+
+
+
+site.pp
+
+node 'hostname'{
+
+include ftp-prashant
+
+}
+
+
+========
+note:
+#another way of calling subclass in the main class
+
+class ftp-prasnat{ 
+
+class {'::ftp-prashant::pkg':}   -> 
+class {'::ftp-prashant::config'} ~>
+class {'::ftp-prashant::service'} ->
+
+}
+
+
+
+
+
+=======
+in the client side 
+
+puppet agent -t
+
+
+
+File Reference in the modules:
+===================================
+
+how to call the files or file content into modules. 
+
+index.html
+
+
+static content
+=========================
+
+=> web code should be designed 
+<h> this is my web server </h>
+<p> 
+
+	this is my webserver 
+</p>
+
+Dynamic contetn 
+
+======================
+
+
+
+=> web code should be designed 
+<h> this is my web server </h>
+<p> 
+
+	this is my webserver 
+</p>
+
+
+
+for static module 
+================================
+
+cd webserver/manifest/
+
+puppet module generate prashant-webserver --skipp-interview 
+
+class webserver::package
+{
+	package { "httpd":
+	ensure => 'present',
+	}
+}
+
+config.pp
+class webserver::config {
+	file {"/var/www/html/index.html":
+	ensure => 'file',
+	source => 'puppet:///modules/webserver/index.html',
+	mode =>'0644',
+	}
+
+
+}
+
+
+
+service.pp
+
+class webserver::service {
+	service { 'httpd':
+	ensure => 'running',
+	enable => 'true',
+	
+}
+}
+
+
+mkdir -p /webserver/files  (this has to create manually)
+
+vi webserver/files/index.html
+		
+<html>
+<h> this is my web server </h>
+<p> 
+
+	this is my webserver 
+</p>
+
+</html>
+
+
+vi webserver/manifest/init.pp
+
+
+class webserver {
+
+	include webserver::package
+	include webserver::config
+	include webserver::service
+
+}
+
+cp -pr webserver/ /etc/puppet/code/module
+
+vim site.pp
+
+node default {
+
+include webserver
+
+}
+
+static way of deploying contetn  finished
+
+==============================
+
+
+
+
+dynamic conent 
+
+mkdir /webserver/templates 
+
+Note :------------extenstion with the erb (extended rubby)
+
+cp webserver/file/index.html  /webserver/templates/index.htnl.erb
+
+index.html.erb  (dynamic page)
+=================================
+
+
+<h> this is my web server  : <%= @fqdn %> </h>
+<p> 
+
+	this is my webserver 
+</p>
+
+
+
+in the config.pp 
+
+
+#change need to be made as below 
+
+
+content => template('modules/webserver/index.html.erb')
+
+cp -rp webserver /etc/puppetlab/code/environme/producation/modules 
+
+
+
+ sftp ftpuser1@13.233.172.235
 
 
 
