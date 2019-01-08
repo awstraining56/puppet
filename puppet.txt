@@ -1,6 +1,7 @@
 it always work with pull mechanism
 
 server ---- > agent
+port number ssl 8140
 
 RunInterval == 30 minutes (1800 seconds)
 
@@ -882,6 +883,128 @@ cp -rp webserver /etc/puppetlab/code/environme/producation/modules
 
 
  sftp ftpuser1@13.233.172.235
+source will be used for static file
+
+
+
+
+Dynamic content managment
+===========================
+
+template.erb
+
+
+modules ->file -> static content 
+
+modules -> dynamic content -> template will be used
+
+
+to call variable into erb file 
+
+<%= @<var> %>
+
+
+==============================
+dynamic  content deployment
+
+==============================
+
+
+
+=> user the *.erb templates in puppet
+
+
+1 create a module
+
+2 define the resource
+
+3 create a "templates" directory
+
+4 create or copy the template to the templates directory
+
+5 define the template contetn in the modules
+	
+		content => template ('<module name>/*.erb')
+		
+6 define the main class file to call the subclass or manifests from the 2nd stepes
+
+7 install or copy the module to the respective are 
+
+(/etc/puppetlab/code/environme/producation/modules)
+
+8 define deployment of the module to the agents (site.pp)
+
+9 check on the agent side
+puppet agent -t 
+
+=============================================
+
+
+
+=========================================
+custome variable defination in template
+
+=========================================
+
+openssh :  permitroot login yes/noarch
+	allow ysers user
+
+	
+params.pp
+
+$permitrootlogin = yes
+$allowuser = sshuser
+
+===> define the variable file : params.pp unde the manifest directory in the module 
+
+
+define the variables: 
+
+	$variable = value
+	
+
+===> to call the variable value into the init.pp or main class file
+
+
+class <module> (
+
+$variable = $module:: params::variable
+) inherits module::params {
+
+include module::subclass1
+
+include module::subclass2
+
+}
+
+
+
+
+puppet script writing 
+====================
+
+Scripting method --- stand alone 
+class method
+module method
+
+
+
+
+
+puppet config print | grep env
+
+puppet config set enviroment  dev
+
+
+advanced concept
+======================
+hiera 
+yum collective 
+
+
+
+
+
 
 
 
